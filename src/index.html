@@ -13,6 +13,14 @@
   <section id="content">
     <form id="search-form" >
       <input type="text" id="search" placeholder="Search for a Github Repo">
+      <label for="sort">Sort by:</label>
+      <select id="sort">
+        <option value="updated">Update date</option>
+        <option value="stars">N° of Stars</option>
+        <option value="forks">N° of Forks</option>
+        <option value="help-wanted-issues">N° of Help Wanted Issues</option>
+      </select>
+      <label for="order">Order:</label>
       <select id="order">
         <option value="desc">Descending</option>
         <option value="asc">Ascending</option>

@@ -13,6 +13,8 @@ body {
     display: flex;
     gap: 10px;
     justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 #search {
@@ -34,6 +36,17 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+label {
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 .result {

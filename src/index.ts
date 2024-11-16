@@ -8,22 +8,37 @@ async function searchGithub(e: Event): Promise<void> {
     
     const form: HTMLFormElement = document.getElementById('search-form') as HTMLFormElement;
     const search: HTMLInputElement = document.getElementById('search') as HTMLInputElement;
+    const order: HTMLSelectElement = document.getElementById('order') as HTMLSelectElement;
+    const sort: HTMLSelectElement = document.getElementById('sort') as HTMLSelectElement;
 
-    // TODO: const searchValue: string = search.value;
-    const searchValue: string = 'react';
+    const searchValue: string = search.value;
     if (!searchValue) {
         return;
     }
 
-    const query: string = buildQuery(searchValue, 1);
+    let orderValue: string = order.value;
+    if (orderValue !== 'asc' && orderValue !== 'desc') {
+        orderValue = 'desc';
+    }
+
+    let sortValue: string = sort.value;
+    if (sortValue !== 'stars' &&
+        sortValue !== 'forks' &&
+        sortValue !== 'updated' &&
+        sortValue !== 'help-wanted-issues'
+    ) {
+        sortValue = 'stars';
+    }
+
+    const query: string = buildQuery(searchValue, 1, orderValue, sortValue);
     const request: Request = buildRequest(query);
 
     const response: Response = await fetch(request);
     await buildResponse(response);
 }
 
-function buildQuery(searchValue: string, page: number): string {
-    return githubAPIURL + `${searchValue}&sort=stars&order=desc&per_page=10&page=${page}`;
+function buildQuery(searchValue: string, page: number, order: string = "desc", sortBy: string = "stars"): string {
+    return githubAPIURL + `${searchValue}&sort=${sortBy}&order=${order}&per_page=10&page=${page}`;
 }
 
 function buildRequest(url: string): Request {
