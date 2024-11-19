@@ -11,10 +11,29 @@ body {
 
 #search-form {
     display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#basic-options {
+    display: flex;
     gap: 10px;
-    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+}
+
+.filter-container {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 #search {
@@ -38,6 +57,19 @@ button:hover {
     background-color: #0056b3;
 }
 
+#search-button {
+    margin: auto;
+    width: 100px;
+    flex: 0 0 40px;
+}
+
+#toggle-filters {
+    font-size: small;
+    background-color: #b7b7b7;
+    width: 100px;
+    flex: 0 0 40px;
+}
+
 label {
     font-weight: bold;
     font-family: 'Courier New', Courier, monospace;
@@ -47,6 +79,10 @@ select {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+.hidden {
+    display: none;
 }
 
 .result {

@@ -3,6 +3,16 @@ const githubAPIURL: string = 'https://api.github.com/search/repositories?q=';
 const form: HTMLFormElement = document.getElementById('search-form') as HTMLFormElement;
 form.addEventListener('submit', searchGithub);
 
+const toggleFiltersButton: HTMLButtonElement = document.getElementById('toggle-filters') as HTMLButtonElement;
+toggleFiltersButton.addEventListener('click', toggleFilters);
+
+type QueryFields = {
+    search: string,
+    page: number,
+    order: string,
+    sort: string
+};
+
 async function searchGithub(e: Event): Promise<void> {
     e.preventDefault();
     
@@ -30,15 +40,23 @@ async function searchGithub(e: Event): Promise<void> {
         sortValue = 'stars';
     }
 
-    const query: string = buildQuery(searchValue, 1, orderValue, sortValue);
+    const queryFields: QueryFields =  {
+        search: searchValue,
+        page: 1,
+        order: orderValue,
+        sort: sortValue
+    };
+
+    const query: string = buildQuery(queryFields);
     const request: Request = buildRequest(query);
 
     const response: Response = await fetch(request);
     await buildResponse(response);
 }
 
-function buildQuery(searchValue: string, page: number, order: string = "desc", sortBy: string = "stars"): string {
-    return githubAPIURL + `${searchValue}&sort=${sortBy}&order=${order}&per_page=10&page=${page}`;
+function buildQuery(query: QueryFields): string {
+    return githubAPIURL +
+    `${query.search}&sort=${query.sort}&order=${query.order}&per_page=10&page=${query.page}`;
 }
 
 function buildRequest(url: string): Request {
@@ -59,7 +77,7 @@ async function buildResponse(response: Response): Promise<void> {
     }
 
     const data = await response.json();
-    resultDiv.innerHTML = getData(data.items).innerHTML;
+    resultDiv.innerHTML = parseData(data.items).innerHTML;
 
     const buttonDiv: HTMLDivElement = document.createElement('div');
     buttonDiv.id = 'nav-buttons';
@@ -77,7 +95,7 @@ async function buildResponse(response: Response): Promise<void> {
     resultDiv.appendChild(buttonDiv);
 }
 
-function getData(items: any[]): HTMLDivElement {
+function parseData(items: any[]): HTMLDivElement {
     const resultDiv: HTMLDivElement = document.createElement('div');
 
     items.forEach((item: any) => {
@@ -170,4 +188,11 @@ function getPreviousButton(response: Response): HTMLButtonElement | null {
     });
 
     return button;
+}
+
+function toggleFilters(e: Event): void {
+    e.preventDefault();
+    const advancedOptions: HTMLDivElement = document.getElementById('advanced-options') as HTMLDivElement;
+    advancedOptions.classList.toggle('hidden');
+    advancedOptions.classList.toggle('filter-container');
 }

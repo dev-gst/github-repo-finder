@@ -12,19 +12,31 @@
   </header>
   <section id="content">
     <form id="search-form" >
-      <input type="text" id="search" placeholder="Search for a Github Repo">
-      <label for="sort">Sort by:</label>
-      <select id="sort">
-        <option value="updated">Update date</option>
-        <option value="stars">N° of Stars</option>
-        <option value="forks">N° of Forks</option>
-        <option value="help-wanted-issues">N° of Help Wanted Issues</option>
-      </select>
-      <label for="order">Order:</label>
-      <select id="order">
-        <option value="desc">Descending</option>
-        <option value="asc">Ascending</option>
-      </select>
+
+      <div id="basic-options">
+        <input type="text" id="search" placeholder="Search for a Github Repo">
+        <label for="sort">Sort by:</label>
+        <select id="sort">
+          <option value="updated">Update date</option>
+          <option value="stars">N° of Stars</option>
+          <option value="forks">N° of Forks</option>
+          <option value="help-wanted-issues">N° of Help Wanted Issues</option>
+        </select>
+        <label for="order">Order:</label>
+        <select id="order">
+          <option value="desc">Descending</option>
+          <option value="asc">Ascending</option>
+        </select>
+        <button type="button" id="toggle-filters">Show Filters</button>
+      </div>
+    
+      <div id="advanced-options" class="hidden">
+        <div class="filter-item">
+          <label for="filterByLanguage">Filter by language:</label>
+          <input id="filterByLanguage" placeholder="ex. Go">
+        </div>
+      </div>
+
       <button id="search-button" type="submit">Search</button>
     </form>
     <div id="result" class="result"></div>
