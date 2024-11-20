@@ -6,11 +6,18 @@ form.addEventListener('submit', searchGithub);
 const toggleFiltersButton: HTMLButtonElement = document.getElementById('toggle-filters') as HTMLButtonElement;
 toggleFiltersButton.addEventListener('click', toggleFilters);
 
+type FilterOptions = {
+    byLanguage: string,
+    byMinCreationDate: string,
+    byMaxCreationDate: string,
+}
+
 type QueryFields = {
     search: string,
     page: number,
     order: string,
-    sort: string
+    sort: string,
+    filterOptions: FilterOptions
 };
 
 async function searchGithub(e: Event): Promise<void> {
@@ -20,31 +27,27 @@ async function searchGithub(e: Event): Promise<void> {
     const search: HTMLInputElement = document.getElementById('search') as HTMLInputElement;
     const order: HTMLSelectElement = document.getElementById('order') as HTMLSelectElement;
     const sort: HTMLSelectElement = document.getElementById('sort') as HTMLSelectElement;
+    const filterOptions: HTMLCollectionOf<HTMLDivElement> = document.getElementsByClassName('filter-item') as HTMLCollectionOf<HTMLDivElement>;
 
     const searchValue: string = search.value;
     if (!searchValue) {
         return;
     }
 
-    let orderValue: string = order.value;
-    if (orderValue !== 'asc' && orderValue !== 'desc') {
-        orderValue = 'desc';
-    }
-
-    let sortValue: string = sort.value;
-    if (sortValue !== 'stars' &&
-        sortValue !== 'forks' &&
-        sortValue !== 'updated' &&
-        sortValue !== 'help-wanted-issues'
-    ) {
-        sortValue = 'stars';
-    }
-
+    const orderValue: string = parserOrder(order.value);
+    const sortValue: string =  parserSort(sort.value);
+    const filterOptionsValue: FilterOptions = parseFilters(filterOptions);
+    
     const queryFields: QueryFields =  {
         search: searchValue,
         page: 1,
         order: orderValue,
-        sort: sortValue
+        sort: sortValue,
+        filterOptions: {
+            byLanguage: filterOptionsValue.byLanguage,
+            byMinCreationDate: filterOptionsValue.byMinCreationDate,
+            byMaxCreationDate: filterOptionsValue.byMaxCreationDate
+        }
     };
 
     const query: string = buildQuery(queryFields);
@@ -52,11 +55,29 @@ async function searchGithub(e: Event): Promise<void> {
 
     const response: Response = await fetch(request);
     await buildResponse(response);
+
+    console.log(query);
 }
 
 function buildQuery(query: QueryFields): string {
-    return githubAPIURL +
-    `${query.search}&sort=${query.sort}&order=${query.order}&per_page=10&page=${query.page}`;
+    const perPage: number = 10;
+    let filters: string = ''
+
+    if (query.filterOptions.byLanguage) {
+        filters = filters.concat(`+language:${query.filterOptions.byLanguage}`);
+    }
+
+    if (query.filterOptions.byMinCreationDate && query.filterOptions.byMaxCreationDate) {
+        filters = filters.concat(`+created:${query.filterOptions.byMinCreationDate}..${query.filterOptions.byMaxCreationDate}`);
+    } else if (query.filterOptions.byMinCreationDate) {
+        filters = filters.concat(`+created:>${query.filterOptions.byMinCreationDate}`);
+    } else if (query.filterOptions.byMaxCreationDate) {
+        filters = filters.concat(`+created:<${query.filterOptions.byMaxCreationDate}`);
+    }
+
+    const finalQuery: string = `${query.search}${filters}&sort=${query.sort}&order=${query.order}&per_page=${perPage}&page=${query.page}`;
+
+    return githubAPIURL + finalQuery;
 }
 
 function buildRequest(url: string): Request {
@@ -77,6 +98,8 @@ async function buildResponse(response: Response): Promise<void> {
     }
 
     const data = await response.json();
+
+    console.log(data);
     resultDiv.innerHTML = parseData(data.items).innerHTML;
 
     const buttonDiv: HTMLDivElement = document.createElement('div');
@@ -120,6 +143,53 @@ function parseData(items: any[]): HTMLDivElement {
     });
 
     return resultDiv;
+}
+
+function parserOrder(orderValue: string): string {
+    if (orderValue !== 'asc' && orderValue !== 'desc') {
+        orderValue = 'desc';
+    }
+
+    return orderValue;
+}
+
+function parserSort(sortValue: string): string {
+    if (sortValue !== 'stars' &&
+        sortValue !== 'forks' &&
+        sortValue !== 'updated' &&
+        sortValue !== 'help-wanted-issues'
+    ) {
+        sortValue = 'stars';
+    }
+
+    return sortValue;
+}
+
+function parseFilters(filterOptions: HTMLCollectionOf<HTMLDivElement>): FilterOptions {
+    const filterOptionsValue: FilterOptions = {
+        byLanguage: '',
+        byMinCreationDate: '',
+        byMaxCreationDate: ''
+    };
+
+    for (let div of filterOptions) {
+        const value: string = div.getElementsByTagName('input')[0].value;
+        const filter: string = div.getElementsByTagName('input')[0].id;
+
+        switch (filter) {
+            case 'language':
+                filterOptionsValue.byLanguage = value;
+                break;
+            case 'min-creation-date':
+                filterOptionsValue.byMinCreationDate = value;
+                break;
+            case 'max-creation-date':
+                filterOptionsValue.byMaxCreationDate = value;
+                break;
+        }
+    }
+
+    return filterOptionsValue;
 }
 
 function getNextButton(response: Response): HTMLButtonElement | null {
