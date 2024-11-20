@@ -23,7 +23,6 @@ type QueryFields = {
 async function searchGithub(e: Event): Promise<void> {
     e.preventDefault();
     
-    const form: HTMLFormElement = document.getElementById('search-form') as HTMLFormElement;
     const search: HTMLInputElement = document.getElementById('search') as HTMLInputElement;
     const order: HTMLSelectElement = document.getElementById('order') as HTMLSelectElement;
     const sort: HTMLSelectElement = document.getElementById('sort') as HTMLSelectElement;
@@ -55,8 +54,6 @@ async function searchGithub(e: Event): Promise<void> {
 
     const response: Response = await fetch(request);
     await buildResponse(response);
-
-    console.log(query);
 }
 
 function buildQuery(query: QueryFields): string {
@@ -98,8 +95,6 @@ async function buildResponse(response: Response): Promise<void> {
     }
 
     const data = await response.json();
-
-    console.log(data);
     resultDiv.innerHTML = parseData(data.items).innerHTML;
 
     const buttonDiv: HTMLDivElement = document.createElement('div');
