@@ -1,5 +1,7 @@
 # Github Repo Finder
 
+by: Gustavo de Araújo Garcia
+
 Github Repo Finder is a web application that allows users to search for GitHub repositories based on various criteria such as stars, forks, update date, and help-wanted issues. Users can also filter results by language and creation date.
 
 ## Features
